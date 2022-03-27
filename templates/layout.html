@@ -1,0 +1,69 @@
+<!-- This html file will be inherited by all templates. -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- https://favicon.io/emoji-favicons/money-bag/ -->
+  <link href="/static/favicon.ico" rel="icon">
+
+  <title>{% block title %}{% endblock %}</title>
+
+  <link rel="stylesheet" href="../static/layout.css">
+
+</head>
+<body>
+  <nav class="navbar">
+
+    <!-- This div contains the logo and the menu button -->
+    <div class="mobile-menu">
+      <div id="logo">
+        <div class="brand-icn">
+          <img src="../static/icons8-stock-64.png" alt="">
+        </div>
+        <div class="company-name">
+          <h1>Laxmi Chit Fund</h1>
+        </div>
+      </div>
+      <div class="menu-btn">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
+    </div>
+
+    <div class="menu-links">
+      <!-- Options available to the user when logged in. -->
+      <div class="stock-actions">
+        <div class="link">
+          <a href="#">Quote</a>
+        </div>
+        <div class="link">
+          <a href="#">Buy</a>
+        </div>
+        <div class="link">
+          <a href="#">Sell</a>
+        </div>
+        <div class="link">
+          <a href="#">History</a>
+        </div>
+      </div>
+
+      <div class="user-actions">
+        <div class="link">
+          <a href="#">Log Out</a>
+        </div>
+      </div>
+    </div>
+
+  </nav>
+
+
+  {% block body %}
+  {% endblock %}
+</body>
+<script src="../static/dropdown.js"></script>
+</html>
