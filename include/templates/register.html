@@ -5,8 +5,8 @@ register
 {% endblock %}
 
 {% block head %}
-  <link rel="stylesheet" href="../static/forms.css">
-  <link rel="stylesheet" href="../static/color_scheme.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='/styles/forms.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='/styles/color_scheme.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -22,7 +22,7 @@ register
         <p class="gen-txt">Email</p>
         <div class="input">
           <div class="input-icn total-center">
-            <img src="../static/assets/3669350_email_ic_icon.svg" alt="">
+            <img src="{{ url_for('static', filename='/assets/3669350_email_ic_icon.svg') }}" alt="">
           </div>
 
           {% if form.email.errors %}
@@ -39,7 +39,7 @@ register
         <p class="gen-txt">Username</p>
         <div class="input">
           <div class="input-icn total-center">
-            <img src="../static/assets/352002_account_circle_icon.svg" alt="">
+            <img src="{{ url_for('static', filename='/assets/352002_account_circle_icon.svg') }}" alt="">
           </div>
 
           {% if form.username.errors %}
@@ -56,7 +56,7 @@ register
         <p class="gen-txt">Password</p>
         <div class="input">
           <div class="input-icn total-center">
-            <img src="../static/assets/icons8-password-16.png" alt="">
+            <img src="{{ url_for('static', filename='/assets/icons8-password-16.png') }}" alt="">
           </div>
 
           {% if form.password.errors %}
@@ -73,7 +73,7 @@ register
         <p class="gen-txt">Confirm Password</p>
         <div class="input">
           <div class="input-icn total-center">
-            <img src="../static/assets/icons8-password-16.png" alt="">
+            <img src="{{ url_for('static', filename='/assets/icons8-password-16.png') }}" alt="">
           </div>
 
           {% if form.confirm_password.errors %}

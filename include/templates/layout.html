@@ -8,12 +8,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- https://favicon.io/emoji-favicons/money-bag/ -->
-  <link href="/static/favicon.ico" rel="icon">
+  <link href="{{ url_for('static', filename='/assets/favicon.ico') }}" rel="icon">
 
   <title>{% block title %}{% endblock %}</title>
 
-  <link rel="stylesheet" href="../static/layout.css">
-  <link rel="stylesheet" href="../static/flash.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='/styles/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='/styles/flash.css') }}">
 
   {% block head %}{% endblock %}
 
@@ -25,7 +25,7 @@
     <div class="mobile-menu">
       <div id="logo">
         <div class="brand-icn">
-          <img src="../static/icons8-stock-64.png" alt="">
+          <img src="{{ url_for('static', filename='/assets/icons8-stock-64.png') }}" alt="">
         </div>
         <div class="company-name">
           <h1>Stocks</h1>
@@ -84,6 +84,6 @@
   {% block body %}
   {% endblock %}
 </body>
-<script src="../static/dropdown.js"></script>
-<script src="../static/alert.js"></script>
+<script src="{{ url_for('static', filename='/scripts/dropdown.js') }}"></script>
+<script src="{{ url_for('static', filename='/scripts/alert.js') }}"></script>
 </html>

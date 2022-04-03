@@ -5,8 +5,8 @@ login
 {% endblock %}
 
 {% block head %}
-  <link rel="stylesheet" href="../static/forms.css">
-  <link rel="stylesheet" href="../static/color_scheme.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='/styles/forms.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='/styles/color_scheme.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -22,7 +22,7 @@ login
         <p class="gen-txt">Email</p>
         <div class="input">
           <div class="input-icn total-center">
-            <img src="../static/assets/3669350_email_ic_icon.svg" alt="">
+            <img src="{{ url_for('static', filename='/assets/3669350_email_ic_icon.svg') }}" alt="">
           </div>
           {% if form.email.errors %}
             {{ form.email(placeholder ='email...', class='is-invalid') }}
@@ -37,7 +37,7 @@ login
         <p class="gen-txt">Password</p>
         <div class="input">
           <div class="input-icn total-center">
-            <img src="../static/assets/icons8-password-16.png" alt="">
+            <img src="{{ url_for('static', filename='/assets/icons8-password-16.png') }}" alt="">
           </div>
           {% if form.password.errors %}
             {{ form.password(placeholder ='password', class = 'is-invalid') }}
