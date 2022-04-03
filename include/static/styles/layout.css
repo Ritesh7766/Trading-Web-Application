@@ -31,7 +31,7 @@ Styling the navigation bar.
     flex-grow: 1; /* Make this div occupy all the remaining space inside the parent div. */
 }
 
-.stock-actions {
+.stock-actions, .user-actions {
     display: flex;
 }
 

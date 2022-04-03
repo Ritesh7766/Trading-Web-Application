@@ -2,6 +2,7 @@ from flask import Flask, render_template, url_for, flash, redirect
 from include.forms import LoginForm, RegistrationForm
 from include.models import User
 from include import app, db
+from flask_login import login_user, current_user, logout_user
 
 
 @app.route('/')
@@ -42,8 +43,21 @@ def register():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        if form.email.data == 'hello' and form.password.data == 'hello':
-            flash('Success', category = 'success')
-        else:
-            flash('Failure', category = 'danger')
+        # Find a user with the given credentials
+        user = User.query.filter_by(email = form.email.data).first()
+
+        # If credentials are correct, than log in the user.
+        if user and user.check_password(form.password.data):
+            login_user(user, remember=form.remember.data)
+            flash('Login successful.', category = 'success')
+            return redirect(url_for('index'))
+        else: 
+            flash('Login unsuccessful. Please check email and password.', category = 'danger')
     return render_template('login.html', form = form)
+
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    flash('You were logged out of your account.', category = 'primary')
+    return redirect(url_for('index'))

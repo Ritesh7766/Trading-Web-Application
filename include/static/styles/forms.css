@@ -63,3 +63,11 @@ Adding space in between fields
 .header {
     margin: 20px 10px;
 }
+
+.check-box {
+    margin: 20px 10px;
+}
+
+.form-check-label {
+    color: #676767;
+}

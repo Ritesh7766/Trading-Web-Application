@@ -48,7 +48,13 @@ login
       </div>
 
       {{ form.submit(class = 'submit-btn info info-border info-txt info-highlight') }}
+
+      <div class="check-box">
+        {{ form.remember() }}
+        {{ form.remember.label(class="form-check-label") }}
+      </div>
     </div>
+
   </div>
 
 </form>

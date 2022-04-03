@@ -40,26 +40,53 @@
 
     <div class="menu-links">
       <!-- Options available to the user when logged in. -->
-      <div class="stock-actions">
-        <div class="link">
-          <a href="#">Quote</a>
+      {% if current_user.is_authenticated %}
+        <div class="stock-actions">
+          <div class="link">
+            <a href="#">Quote</a>
+          </div>
+          <div class="link">
+            <a href="#">Buy</a>
+          </div>
+          <div class="link">
+            <a href="#">Sell</a>
+          </div>
+          <div class="link">
+            <a href="#">History</a>
+          </div>
         </div>
-        <div class="link">
-          <a href="#">Buy</a>
-        </div>
-        <div class="link">
-          <a href="#">Sell</a>
-        </div>
-        <div class="link">
-          <a href="#">History</a>
-        </div>
-      </div>
 
-      <div class="user-actions">
-        <div class="link">
-          <a href="#">Log Out</a>
+        <div class="user-actions">
+          <div class="link">
+            <a href="{{ url_for('logout') }}">Log Out</a>
+          </div>
         </div>
-      </div>
+      {% else %}
+      <!-- Options available to the user when logged out. -->
+        <div class="stock-actions">
+          <div class="link">
+            <a href="#">About</a>
+          </div>
+          <div class="link">
+            <a href="#">Services</a>
+          </div>
+          <div class="link">
+            <a href="#">Contact us</a>
+          </div>
+          <div class="link">
+            <a href="#">IEX</a>
+          </div>
+        </div>
+
+        <div class="user-actions">
+          <div class="link">
+            <a href="{{ url_for('register') }}">Register</a>
+          </div>
+          <div class="link">
+            <a href="{{ url_for('login') }}">Log in</a>
+          </div>
+        </div>
+      {% endif %}
     </div>
 
   </nav>
