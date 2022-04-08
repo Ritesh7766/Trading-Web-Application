@@ -93,7 +93,7 @@ img {
         z-index: 99;
     }
 
-    .stock-actions {
+    .stock-actions, .user-actions {
         flex-direction: column;
     }
 

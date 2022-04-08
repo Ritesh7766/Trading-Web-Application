@@ -3,6 +3,7 @@ from include.forms import LoginForm, RegistrationForm
 from include.models import User
 from include import app, db
 from flask_login import login_user, current_user, logout_user
+from include.utils import logout_required, login_required
 
 
 @app.route('/')
@@ -12,8 +13,10 @@ def index():
 
 
 @app.route('/register', methods = ['GET', 'POST'])
+@logout_required(current_user, redirect)
 def register():
     form = RegistrationForm()
+
     if form.validate_on_submit():
         # Create a new instance of the user.
         user = User(username = form.username.data, email = form.email.data, password = form.password.data)
@@ -40,8 +43,10 @@ def register():
 
 
 @app.route('/login', methods = ['GET', 'POST'])
+@logout_required(current_user, redirect)
 def login():
     form = LoginForm()
+
     if form.validate_on_submit():
         # Find a user with the given credentials
         user = User.query.filter_by(email = form.email.data).first()
@@ -57,6 +62,7 @@ def login():
 
 
 @app.route('/logout')
+@login_required(current_user, redirect)
 def logout():
     logout_user()
     flash('You were logged out of your account.', category = 'primary')
