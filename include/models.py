@@ -27,10 +27,19 @@ class User(db.Model, UserMixin):
         return bcrypt.check_password_hash(self.password_hash, attempted_password)
 
 
+class Stock(db.Model):
+    symbol = db.Column(db.String(20), primary_key = True)
+    company_name = db.Column(db.String(200), nullable = False)
+
+    # Specifying how the object is printed whenever we print it out.
+    def __repr__(self):
+        return f"User('{self.symbol}', '{self.company_name}')"
+
+
 
 class Stocks_Owned(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key = True)
-    stock_id = db.Column(db.String(20), primary_key = True)
+    stock_id = db.Column(db.String(20), db.ForeignKey('stock.symbol'), primary_key = True)
     quantity = db.Column(db.Integer, nullable = False)
 
     # Specifying how the object is printed whenever we print it out.
