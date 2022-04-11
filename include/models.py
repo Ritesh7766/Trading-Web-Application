@@ -5,6 +5,7 @@ from flask_login import UserMixin
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key = True, autoincrement = True) 
     username = db.Column(db.String(20), unique = True, nullable = False)
@@ -34,7 +35,6 @@ class Stock(db.Model):
     # Specifying how the object is printed whenever we print it out.
     def __repr__(self):
         return f"User('{self.symbol}', '{self.company_name}')"
-
 
 
 class Stocks_Owned(db.Model):

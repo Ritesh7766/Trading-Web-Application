@@ -1,13 +1,9 @@
-from flask import Flask, render_template, url_for, flash, redirect, jsonify, request
+from flask import Flask, render_template, url_for, flash, redirect, jsonify, request, session
 from include.forms import LoginForm, RegistrationForm
-from include.models import User
+from include.models import User, Stock
 from include import app, db
 from flask_login import login_user, current_user, logout_user
-from include.utils import logout_required, login_required
-
-
-token = 'Tpk_c1f51c49da9c413a9ea676bfd7322915'
-api_url = f'https://sandbox.iexapis.com/stable/stock/IBM/quote?token={token}'
+from include.utils import logout_required, login_required, lookup_symbol
 
 
 @app.route('/')
@@ -73,15 +69,49 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route('/quoted')
+@app.route('/availableStocks')
 @login_required(current_user, redirect)
-def quoted():
-    return render_template('quote.html')
+def available_stocks():
+    return render_template('available_stocks.html')
 
 
-# Limit the number of search results to 20.
-@app.route('/quote')
+@app.route('/quote', methods = ['GET', 'POST'])
+@login_required(current_user, redirect)
 def quote():
+    # Default views for users.
+    views = ['Overview', 'Fundamental']
+    # If user has entered a symbol.
+    if request.method == 'POST':
+        symbol = request.form.get('symbol')
+        view = request.form.get('view')
+        symbol = symbol.upper()
+        # Validate view
+        if view not in views:
+            flash('Invalid input.', category = 'warning')
+            return redirect('quote')
+        # If symbol already exits in the session variable, than there is no need to make an api call.
+        if symbol in session:
+            stock_info = session[symbol]
+        # Otherwise make an api call.
+        else: stock_info = lookup_symbol(symbol)
+        if not stock_info:
+            flash('Invalid symbol.', category = 'warning')
+        else:
+            # If the symbol is correct make sure it exists in our database.
+            res = db.engine.execute(f'SELECT symbol FROM stock WHERE symbol = "{symbol}"')
+            if not res:
+                new_stock = Stock(symbol = symbol, company_name = stock_info[symbol]['company']["companyName"])
+                db.session.add(new_stock)
+                db.session.commit()
+            # Add info to the session variable.
+            session[symbol] = stock_info
+            return render_template('quoted.html', stock_info = stock_info[symbol], view = view, views = views)
+    return render_template('quote.html', views = views)
+
+
+@app.route('/search')
+@login_required(current_user, redirect)
+def search():
     sym = request.args.get('sym')
     nm = request.args.get('nm')
     data, res = [], None
@@ -91,10 +121,11 @@ def quote():
     # If user has entered a name, than search by name.
     elif nm:
         res = db.engine.execute(f'SELECT * FROM stock WHERE stock.company_name LIKE "%{nm}%" LIMIT 20')
+    # If no symbol provided, than return the first 20 stocks.
+    if not res:
+        res = db.engine.execute(f'SELECT * FROM stock LIMIT 20')
     # Convert the data into a list of dictionaries.
-    if res:
-        for symbol, name in res:
-            data.append({symbol: name})
-    
+    for symbol, name in res:
+        data.append({'symbol': symbol, 'name': name})
     # Return the result in JSON format.
     return jsonify(data)

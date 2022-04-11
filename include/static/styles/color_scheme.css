@@ -16,6 +16,25 @@
     transition-duration: 0.4s;
 } 
 
+
+.success {
+   background-color: #d0ffa0;
+}
+
+.success-border {
+    border: 1px solid #6bbf17;
+}
+
+.success-txt {
+    color: #6ec716;
+}
+
+.success-highlight:hover {
+    background-color: #7ee318;
+    color: white;
+    transition-duration: 0.4s;
+} 
+
 /*---------------------------------------*/
 
 .gen {

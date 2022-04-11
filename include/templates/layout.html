@@ -43,7 +43,7 @@
       {% if current_user.is_authenticated %}
         <div class="stock-actions">
           <div class="link">
-            <a href="#">Quote</a>
+            <a href="{{ url_for('quote') }}">Quote</a>
           </div>
           <div class="link">
             <a href="#">Buy</a>
@@ -53,6 +53,9 @@
           </div>
           <div class="link">
             <a href="#">History</a>
+          </div>
+          <div class="link">
+            <a href="{{ url_for('available_stocks') }}">Available Stocks</a>
           </div>
         </div>
 
@@ -69,6 +72,9 @@
           </div>
           <div class="link">
             <a href="#">Contact us</a>
+          </div>
+          <div class="link">
+            <a href="#">Services</a>
           </div>
           <div class="link">
             <a href="#">IEX</a>
@@ -107,6 +113,8 @@
 
   {% block body %}
   {% endblock %}
+
+  <div class="seperator"></div>
 </body>
 <script src="{{ url_for('static', filename='/scripts/dropdown.js') }}"></script>
 <script src="{{ url_for('static', filename='/scripts/alert.js') }}"></script>

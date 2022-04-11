@@ -89,7 +89,7 @@ img {
         flex-direction: column;
         text-align: center;
         transition: 1.2s all ease;
-        transform: translateY(-500px);
+        transform: translateY(-600px);
         z-index: 99;
     }
 
@@ -115,7 +115,7 @@ img {
 
     /* Vertical animation */
     .active.navbar {
-        height: 489px;
+        height: 570px;
     }
 
     .active.menu-links {

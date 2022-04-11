@@ -1,0 +1,27 @@
+.information {
+    margin: 30px;
+}
+
+.container {
+    display: flex;
+}
+
+.img {
+    width: 150px;
+}
+
+.img img {
+    max-width: 100%;
+}
+
+.co_info {
+    margin: 20px;
+}
+
+.info-type {
+    margin-bottom: 20px;
+}
+
+.description {
+    width: 400px;
+}

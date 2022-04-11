@@ -10,7 +10,7 @@ Perfectly center a div.
 /*
 Following lines of css is used for styling the input field.
 */
-.field input {
+.field input, .field select {
     padding: 15px 35px;
     border-radius: 10px;
     padding-left: 40px;

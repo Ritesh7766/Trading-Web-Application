@@ -6,42 +6,46 @@ quote
 
 {% block head %}
   <link rel="stylesheet" href="{{ url_for('static', filename='/styles/forms.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='/styles/table.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='/styles/color_scheme.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='/styles/flex_container.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='/styles/recon.css') }}">
 {% endblock %}
 
 {% block body %}
-<div class="total-center">
-  <div class="search-options">
-    <!-- Allows user to look up a stock by its symbol -->
-    <div class="symbol-search">
-      <div class="field">
-        <div class="input">
-          <div class="input-icn total-center">
-            <img src="{{ url_for('static', filename='/assets/icons8-search.svg') }}" alt="">
+  <div class="flex-container">
+    <div class="sidebar">
+      <form action="{{ url_for('quote') }}" method="post">
+        <div class="field">
+          <p class="gen-txt">Symbol</p>
+          <div class="input">
+            <div class="input-icn total-center">
+              <img src="{{ url_for('static', filename='/assets/icons8-stock-share-96.png') }}" alt="">
+            </div>
+            <input id="symbol" type="text" placeholder="SYMBOL" autocomplete = "off" name="symbol">
           </div>
-          <input id="symbol" type="text" placeholder="Search by symbol" autocomplete = "off" name="id">
         </div>
-      </div>
+
+        <div class="field">
+          <p class="gen-txt">View</p>
+          <div class="input">
+            <div class="input-icn total-center">
+              <img src="{{ url_for('static', filename='/assets/icons8-information-96.png') }}" alt="">
+            </div>
+            <select name="view" id="view">
+              {% for view in views %}
+                <option value="{{ view }}">{{ view }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <input type="submit" name="quote" value="Quote" class="submit-btn info info-border info-txt info-highlight">
+      </form>
     </div>
 
-    <!-- Allows a user to look upa stock by its name -->
-    <div class="symbol-search">
-      <div class="field">
-        <div class="input">
-          <div class="input-icn total-center">
-            <img src="{{ url_for('static', filename='/assets/icons8-search.svg') }}" alt="">
-          </div>
-          <input id="name" type="text" placeholder="Search by name" autocomplete = "off" name="nm">
-        </div>
-      </div>
+    <div class="information">
+      {% block quote %}
+      {% endblock %}
     </div>
   </div>
-
-  <!-- Display a list of stocks which match the search value -->
-  <div class="table">
-    <!-- The table is created using AJAX -->
-  </div>
-</div>
-
-<script src="{{ url_for('static', filename='/scripts/search.js') }}"></script>
 {% endblock %}
