@@ -32,7 +32,6 @@ def lookup_symbol(symbol):
     # Request the api for information.
     try:
         token = os.environ['IEX']
-        print(token)
         #token = 'Tpk_c1f51c49da9c413a9ea676bfd7322915'
         url = f'https://cloud.iexapis.com/stable/stock/market/batch?symbols={symbol}&types=logo,company,quote&token={token}'
         #url = f'https://sandbox.iexapis.com/stable/stock/market/batch?symbols={symbol}&types=Logo,company,quote&token={token}'

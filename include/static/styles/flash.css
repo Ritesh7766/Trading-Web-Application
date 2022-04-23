@@ -30,13 +30,13 @@
 }
 
 .alert-warning {
-    background-color: rgb(255, 251, 195);
-    color: rgb(165, 165, 0);
+    background-color: rgb(255 245 173);
+    color: rgb(165 125 0);
 }
 
 .close-warning {
-    background-color: rgb(255, 251, 195);
-    color: rgb(165, 165, 0);
+    background-color: rgb(255 245 173);
+    color: rgb(165 125 0);
 }
 
 .alert-primary {

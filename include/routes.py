@@ -79,7 +79,7 @@ def available_stocks():
 @login_required(current_user, redirect)
 def quote():
     # Default views for users.
-    views = ['Overview', 'Fundamental']
+    views = ['Overview', 'Fundamentals']
     # If user has entered a symbol.
     if request.method == 'POST':
         symbol = request.form.get('symbol')
@@ -107,6 +107,15 @@ def quote():
             session[symbol] = stock_info
             return render_template('quoted.html', stock_info = stock_info[symbol], view = view, views = views)
     return render_template('quote.html', views = views)
+
+
+@app.route('/view')
+@login_required(current_user, redirect)
+def view():
+    sym = request.args.get('sym')
+    if sym not in session:
+        return None
+    return jsonify(session[sym][sym])
 
 
 @app.route('/search')

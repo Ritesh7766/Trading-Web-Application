@@ -25,3 +25,15 @@
 .description {
     width: 400px;
 }
+
+p, b {
+    white-space: pre-wrap;
+}
+
+.flex-box {
+    display: flex;
+}
+
+.sub-info {
+    display: flex;
+}
