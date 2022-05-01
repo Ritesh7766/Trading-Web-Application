@@ -1,3 +1,4 @@
+import datetime
 from include import db, bcrypt, login_manager
 from flask_login import UserMixin
 
@@ -46,7 +47,7 @@ class Stocks_Owned(db.Model):
 
     # Specifying how the object is printed whenever we print it out.
     def __repr__(self):
-        return f"Stocks_Owned('{self.user_id}', '{self.stock_id}, '{self.quantity}')"
+        return f"Stocks_Owned('{self.user_id}', '{self.stock_id}, '{self.shares}')"
 
 
 class Transaction(db.Model):
@@ -55,6 +56,7 @@ class Transaction(db.Model):
     stock_id = db.Column(db.String(20), db.ForeignKey('stock.symbol'))
     shares = db.Column(db.Integer, nullable = False)
     price = db.Column(db.Float, nullable = False)
+    transacted = db.Column(db.DateTime, default = datetime.datetime.now() )
 
     # Specifying how the object is printed whenever we print it out.
     def __repr__(self):

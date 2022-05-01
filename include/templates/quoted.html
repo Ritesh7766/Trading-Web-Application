@@ -7,6 +7,7 @@
       <div class="img">
         <img src="{{ stock_info['logo']['url'] }}">
       </div>
+      <a href="/buy?sym={{ stock_info['quote']['symbol']}}"><button id="buy" class="submit-btn success success-border success-txt success-highlight">Buy</button></a>
     </div>
     {% if view == 'Overview' %}
       <div class="reconissance">

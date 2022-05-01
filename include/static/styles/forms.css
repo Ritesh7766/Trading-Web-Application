@@ -44,6 +44,7 @@ Adding styles to the submit button
     border-radius: 10px;
     float: right;
     margin: 10px 10px;
+    min-width: 70px;
 }
 
 /* 
@@ -53,7 +54,7 @@ Adding space in between fields
     margin-top: 40px;
     background-color: #fafafa;
     border-radius: 10px;
-    box-shadow: 0px 0px 10px 5px #f2efef;
+    box-shadow: 0px 0px 10px 5px #d7d7d7;
 }
 
 .field {

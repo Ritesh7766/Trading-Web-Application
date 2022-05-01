@@ -1,6 +1,6 @@
 from flask import Flask, render_template, url_for, flash, redirect, jsonify, request, session
-from include.forms import LoginForm, RegistrationForm
-from include.models import User, Stock
+from include.forms import LoginForm, RegistrationForm, PurchaseForm
+from include.models import User, Stock, Stocks_Owned, Transaction
 from include import app, db
 from flask_login import login_user, current_user, logout_user
 from include.utils import logout_required, login_required, lookup_symbol
@@ -140,3 +140,54 @@ def search():
         data.append({'symbol': symbol, 'name': name})
     # Return the result in JSON format.
     return jsonify(data)
+
+
+@app.route('/buy', methods = ['GET', 'POST'])
+@login_required(current_user, redirect)
+def buy():
+    form = PurchaseForm()
+    # No need to validate symbol. This task was alrady completed before being redirected to this route.
+    symbol = request.args.get('sym')
+    stock_info = session[symbol][symbol]
+
+    if form.validate_on_submit():
+        if 'submit' not in request.form:
+            return redirect(url_for('quote'))
+        shares = int(request.form.get('shares'))
+        price = float(stock_info['quote']['latestPrice'])
+        # Compute the total cost of purchasing the stocks.
+        total = shares * price
+
+        # Find the balance of the user.
+        balance = current_user.cash
+        
+        # If the available balance is less than the cost than cancel transaction.
+        if balance < total:
+            flash(f'Insufficient Balance!', category = 'primary')
+
+        # Otherwise deduct the amount from the current balance.
+        current_user.cash -= total
+        db.session.commit()
+
+        # Update ownership.
+        stock = Stocks_Owned.query.filter_by(user_id = current_user.id, stock_id = stock_info['quote']['symbol']).first()
+        # If user already owns this stock than update it.
+        if stock:
+            stock.shares += shares
+        # Otherwise add it to the db
+        else:
+            stock_owned = Stocks_Owned(user_id = current_user.id, stock_id = stock_info['quote']['symbol'], shares = shares, logo = stock_info['logo']['url'])
+            db.session.add(stock_owned)
+        db.session.commit()
+
+        # Record the transaction.
+        transaction = Transaction(user_id = current_user.id, stock_id = stock_info['quote']['symbol'], shares = shares, price = price)
+        db.session.add(transaction)
+        db.session.commit()
+        
+    elif form.errors != {}:
+        for category, err_msgs in form.errors.items():
+            for err_msg in err_msgs:
+                flash(f'There was an error: {err_msg}', category = 'danger')
+
+    return render_template('buy.html', form = form, stock_info = stock_info)

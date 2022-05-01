@@ -1,0 +1,17 @@
+.form {
+    display: flex;
+    margin: 40px;
+    padding: 50px 40px;
+}
+
+.form * {
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.stock-logo {
+    margin-right: 40px;
+}
+
+.stock-info {
+    margin-bottom: 20px;
+}

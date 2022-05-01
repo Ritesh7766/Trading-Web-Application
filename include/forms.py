@@ -45,3 +45,15 @@ class LoginForm(FlaskForm):
     password = PasswordField()
     remember = BooleanField('Remember Me')
     submit = SubmitField(label = 'Log In')
+
+
+class PurchaseForm(FlaskForm):
+    shares = StringField()
+    submit = SubmitField(label = 'Buy')
+
+    def validate_shares(self, shares):
+        if not shares.data.isdigit():
+            raise ValidationError('Number of shares must be a positive number!')
+        if int(shares.data) <= 0:
+            raise ValidationError('Number of shares must be at least 1.')
+
