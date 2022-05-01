@@ -2,6 +2,10 @@ html, body {
     height: 100%;
 }
 
+/*
+Fixed sidebar for PC
+*/
+
 .flex-container {
     min-height: 100%;
     height: fit-content;
@@ -11,6 +15,8 @@ html, body {
 .sidebar {
     background-color: #f5f5f5;
     border: 1px solid #d8d8d8;
+    position: fixed;
+    height: 100%;
 }
 
 .field {
@@ -22,8 +28,13 @@ html, body {
     margin: 20px;
 }
 
+
 @media screen and (max-width: 670px) {
     .flex-container {
         flex-direction: column;
+    }
+
+    .sidebar {
+        position: static;
     }
 }

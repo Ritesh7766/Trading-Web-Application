@@ -11,6 +11,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(20), unique = True, nullable = False)
     email = db.Column(db.String(120), unique = True, nullable = False)
     password_hash = db.Column(db.String(60), nullable = False)
+    cash = db.Column(db.Float, nullable  = False, default = 10000.0)
 
     # Specifying how the object is printed whenever we print it out.
     def __repr__(self):
@@ -40,8 +41,21 @@ class Stock(db.Model):
 class Stocks_Owned(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key = True)
     stock_id = db.Column(db.String(20), db.ForeignKey('stock.symbol'), primary_key = True)
-    quantity = db.Column(db.Integer, nullable = False)
+    shares = db.Column(db.Integer, nullable = False)
+    logo = db.Column(db.Text)
 
     # Specifying how the object is printed whenever we print it out.
     def __repr__(self):
         return f"Stocks_Owned('{self.user_id}', '{self.stock_id}, '{self.quantity}')"
+
+
+class Transaction(db.Model):
+    t_id = db.Column(db.Integer, autoincrement = True, primary_key = True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    stock_id = db.Column(db.String(20), db.ForeignKey('stock.symbol'))
+    shares = db.Column(db.Integer, nullable = False)
+    price = db.Column(db.Float, nullable = False)
+
+    # Specifying how the object is printed whenever we print it out.
+    def __repr__(self):
+        return f"Stocks_Owned('{self.t_id}', '{self.user_id}, '{self.stock_id}', '{self.shares}', '{self.price}')"

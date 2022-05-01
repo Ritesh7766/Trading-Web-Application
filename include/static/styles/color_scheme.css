@@ -54,3 +54,15 @@
     color: white;
     transition-duration: 0.4s;
  } 
+
+ #buy {
+     width: 57px;
+ }
+
+ .high {
+     color: rgb(1, 199, 1);
+ }
+
+ .low {
+     color: red;
+ }

@@ -92,7 +92,7 @@
               <b>Latest Volume:  </b><p id="latest-volume">{{ stock_info['quote']['latestVolume'] }}    </p>
             </div>
             <div class="sub-info">
-              <b>Previous Volume:  </b><p id="previos-volume">{{ stock_info['quote']['previousVolume'] }}    </p>
+              <b>Previous Volume:  </b><p id="previous-volume">{{ stock_info['quote']['previousVolume'] }}    </p>
             </div>
           </div>
         </div>
@@ -126,20 +126,56 @@
           <b>Primary Exchange: {{ stock_info['quote']['primaryExchange'] }}</b>
         </div>
       </div>
+    {% elif view == 'News' %}
+      <div class="reconissance">
+        {% for news in stock_info['news'] %}
+          <div class="news">
+            <div class="headline">
+              <h1>{{ news["headline"] }}</h1>
+            </div>
+            <div class="source">
+              <p>Posted by {{ news['source'] }} at {{ datetime.fromtimestamp(news['datetime'] / 1000.0).strftime("%m/%d/%Y, %H:%M:%S") }}</p>
+            </div>
+            <div class="link">
+              <a href="{{ news['url'] }}">Source</a>
+            </div>
+            <div class="summary">
+              <p>{{ news['summary'] }}</p>
+            </div>
+            <div class="image">
+              <img src="{{ news['image'] }}" alt="">
+            </div>
+          </div>
+        {% endfor %}
+      </div>
     {% endif %}
   </div>
 
   <script src="{{ url_for('static', filename='/scripts/render_info.js') }}"></script>
+  <script src="{{ url_for('static', filename='/scripts/add_color.js') }}"></script>
   <script>
+
+    window.addEventListener('load', compute);
+
     document.getElementById('view').addEventListener('change', async function() {
       var sym = '{{ stock_info["quote"]["symbol"] }}';
       var response = await fetch(`/view?sym=${sym}`);
       var data = await response.json()
       if (this.value === 'Overview') {
+        //document.getElementsByClassName('container')[0].classList.remove('change-dir');
+        document.getElementsByClassName('info-type')[0].innerHTML = this.value;
         document.getElementsByClassName('reconissance')[0].innerHTML = render_overview(data);
       }
       else if (this.value === 'Fundamentals') {
+        //document.getElementsByClassName('container')[0].classList.remove('change-dir');
+        document.getElementsByClassName('info-type')[0].innerHTML = this.value;
         document.getElementsByClassName('reconissance')[0].innerHTML = render_fundamentals(data);
+        compute();
+      }
+      else if (this.value === 'News') {
+        //document.getElementsByClassName('container')[0].classList.add('change-dir');
+        document.getElementsByClassName('info-type')[0].innerHTML = this.value;
+        document.getElementsByClassName('reconissance')[0].innerHTML = render_news(data);
       }
     });
   </script>

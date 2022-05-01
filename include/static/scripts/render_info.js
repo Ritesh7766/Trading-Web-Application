@@ -89,7 +89,7 @@ function render_fundamentals(stock_info) {
           <b>Latest Volume:  </b><p id="latest-volume">${stock_info['quote']['latestVolume']}    </p>
         </div>
         <div class="sub-info">
-          <b>Previous Volume:  </b><p id="previos-volume">${stock_info['quote']['previousVolume']}    </p>
+          <b>Previous Volume:  </b><p id="previous-volume">${stock_info['quote']['previousVolume']}    </p>
         </div>
       </div>
     </div>
@@ -123,5 +123,39 @@ function render_fundamentals(stock_info) {
       <b>Primary Exchange: ${stock_info['quote']['primaryExchange']}</b>
     </div>
   </div>`
+  return html;
+}
+
+function render_news(stock_info) {
+  news = stock_info['news'];
+  news_item = '';
+  for (var n in news) {
+    var date = new Date(news[n]['datetime'])
+    data = `
+    <div class="news">
+      <div class="headline">
+        <h1>${ news[n]["headline"] }</h1>
+      </div>
+      <div class="source">
+        <p>Posted by ${ news[n]['source'] } at ${ date.toLocaleString() }</p>
+      </div>
+      <div class="link">
+        <a href="${ news[n]['url'] }">Source</a>
+      </div>
+      <div class="summary">
+        <p>${ news[n]['summary'] }</p>
+      </div>
+      <div class="image">
+        <img src="${ news[n]['image'] }" alt="">
+      </div>
+    </div>
+    \n`;
+    news_item += data;
+  }
+  html = `
+  <div class='reconissance'>
+    ${news_item}
+  </div>
+  `;
   return html;
 }

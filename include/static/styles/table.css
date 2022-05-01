@@ -2,6 +2,10 @@
 Styles common to all tables.
 */
 
+#table {
+    margin-left: 250px;
+}
+
 table {
     border-collapse: collapse;
     border: 1px solid #bdc3c7;
@@ -54,5 +58,9 @@ table button {
 @media screen and (max-width: 670px) {
     .btns {
         flex-direction: column;
+    }
+
+    #table {
+        margin: 30px;
     }
 }

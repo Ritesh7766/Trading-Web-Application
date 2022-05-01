@@ -4,6 +4,7 @@ from include.models import User, Stock
 from include import app, db
 from flask_login import login_user, current_user, logout_user
 from include.utils import logout_required, login_required, lookup_symbol
+from datetime import datetime
 
 
 @app.route('/')
@@ -79,11 +80,12 @@ def available_stocks():
 @login_required(current_user, redirect)
 def quote():
     # Default views for users.
-    views = ['Overview', 'Fundamentals']
-    # If user has entered a symbol.
-    if request.method == 'POST':
-        symbol = request.form.get('symbol')
+    views = ['Overview', 'Fundamentals', 'News']
+    # If user has entered a symbol.      
+    if request.method == 'POST' or request.args.get('sym'):
+        symbol = request.form.get('symbol') if request.method == 'POST' else request.args.get('sym')
         view = request.form.get('view')
+        if not view: view = 'Overview'
         symbol = symbol.upper()
         # Validate view
         if view not in views:
@@ -105,7 +107,7 @@ def quote():
                 db.session.commit()
             # Add info to the session variable.
             session[symbol] = stock_info
-            return render_template('quoted.html', stock_info = stock_info[symbol], view = view, views = views)
+            return render_template('quoted.html', stock_info = stock_info[symbol], view = view, views = views, datetime=datetime)
     return render_template('quote.html', views = views)
 
 
@@ -126,13 +128,13 @@ def search():
     data, res = [], None
     # If user has entered a symbol, than search by symbol.
     if sym:
-        res = db.engine.execute(f'SELECT * FROM stock WHERE stock.symbol LIKE "%{sym}%" LIMIT 20')
+        res = db.engine.execute(f'SELECT * FROM stock WHERE stock.symbol LIKE "%{sym}%" LIMIT 70')
     # If user has entered a name, than search by name.
     elif nm:
-        res = db.engine.execute(f'SELECT * FROM stock WHERE stock.company_name LIKE "%{nm}%" LIMIT 20')
-    # If no symbol provided, than return the first 20 stocks.
+        res = db.engine.execute(f'SELECT * FROM stock WHERE stock.company_name LIKE "%{nm}%" LIMIT 70')
+    # If no symbol provided, than return the first 70 stocks.
     if not res:
-        res = db.engine.execute(f'SELECT * FROM stock LIMIT 20')
+        res = db.engine.execute(f'SELECT * FROM stock LIMIT 70')
     # Convert the data into a list of dictionaries.
     for symbol, name in res:
         data.append({'symbol': symbol, 'name': name})
