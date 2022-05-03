@@ -146,10 +146,12 @@ def search():
 @login_required(current_user, redirect)
 def buy():
     form = PurchaseForm()
-    # No need to validate symbol. This task was alrady completed before being redirected to this route.
+    # Make sure symbol exists in session variable.
     symbol = request.args.get('sym')
+    if symbol not in session:
+        stock_info = lookup_symbol(symbol)
+        session[symbol] = stock_info
     stock_info = session[symbol][symbol]
-
     if form.validate_on_submit():
         if 'submit' not in request.form:
             return redirect(url_for('quote'))
@@ -184,10 +186,23 @@ def buy():
         transaction = Transaction(user_id = current_user.id, stock_id = stock_info['quote']['symbol'], shares = shares, price = price)
         db.session.add(transaction)
         db.session.commit()
+
+        flash(f"Purchased {shares} stocks of {stock_info['company']['companyName']} for ${total}", category = 'success')
+        return redirect('/')
         
     elif form.errors != {}:
+        if 'submit' not in request.form:
+            return redirect(url_for('quote'))
         for category, err_msgs in form.errors.items():
             for err_msg in err_msgs:
                 flash(f'There was an error: {err_msg}', category = 'danger')
 
     return render_template('buy.html', form = form, stock_info = stock_info)
+
+
+@app.route('/portfolio')
+@login_required(current_user, redirect)
+def portfolio():
+    # Get all the stocks owned by the user.
+    stocks = Stocks_Owned.query.filter_by(user_id = current_user.id).all()
+    return render_template('portfolio.html', stocks = stocks)

@@ -1,0 +1,63 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+portfolio
+{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='/styles/forms.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='/styles/color_scheme.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='/styles/flex_container.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='/styles/table.css') }}">
+{% endblock %}
+
+{% block body %}
+  <div class="flex-container">
+    <div class="sidebar scrollable">
+
+      <!-- Allows user to look up a stock by its symbol -->
+      <div class="field">
+        <p class="gen-txt">Search by Symbol</p>
+        <div class="input">
+          <div class="input-icn total-center">
+            <img src="{{ url_for('static', filename='/assets/icons8-search.svg') }}" alt="">
+          </div>
+          <input id="symbol" type="text" placeholder="symbol" autocomplete = "off" name="id">
+        </div>
+      </div>
+
+      <!-- Allows a user to look up a stock by its name -->
+      <div class="field">
+        <p class="gen-txt">Search by Name</p>
+        <div class="input">
+          <div class="input-icn total-center">
+            <img src="{{ url_for('static', filename='/assets/icons8-search-in-list-96.png') }}" alt="">
+          </div>
+          <input id="name" type="text" placeholder="name" autocomplete = "off" name="nm">
+        </div>
+      </div>
+
+      <div class="stocks-owned">
+        <table>
+          <tr>
+            <th>Logo</th>
+            <th>Symbol</th>
+            <th>Shares</th>
+          </tr>
+        {% for stock in stocks %} 
+          <tr>
+            <td><img class="small-logo" src="{{ stock.logo }}" alt=""></td>
+            <td>{{ stock.stock_id }}</td>
+            <td>{{ stock.shares }}</td>
+          </tr>
+        {% endfor %}   
+        </table>
+      </div>
+
+    </div>
+
+    <div class="information">
+  
+    </div>
+  </div>
+{% endblock %}

@@ -12,7 +12,7 @@ function parseJSON(json_obj) {
                     <td>
                         <div class="btns">
                             <a href="quote?sym=${json_obj[i].symbol}"><button class="info info-border info-txt info-highlight">Quote</button></a>
-                            <a href="#"><button class="success success-border success-txt success-highlight">Buy</button></a>
+                            <a href="/buy?sym=${json_obj[i].symbol}"><button class="success success-border success-txt success-highlight">Buy</button></a>
                         </div>
                     </td>
                 </tr>`

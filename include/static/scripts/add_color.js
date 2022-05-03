@@ -15,53 +15,40 @@ function compute() {
     var high52 = document.getElementById('high52');
     var low52 = document.getElementById('low52');
 
-    if (latest_price.value >= previous_price.value) {
-        latest_price.classList.add('high');
-        previous_price.classList.add('low');
-        document.getElementById('change').classList.add('high');
-        document.getElementById('change_percent').classList.add('high');
+    if (compare(latest_price, previous_price) ) {
+        set_high(document.getElementById('change') );
+        set_high(document.getElementById('change_percent') );
     }
     else {
-        latest_price.classList.add('low');
-        previous_price.classList.add('high');
-        document.getElementById('change').classList.add('low');
-        document.getElementById('change_percent').classList.add('low');
+        set_low(document.getElementById('change') );
+        set_low(document.getElementById('change_percent') );
     }
 
-    if (high.value >= low.value) {
-        high.classList.add('high');
-        low.classList.add('low');
-    }
-    else {
-        high.classList.add('low');
-        low.classList.add('high');
-    }
+    _ = compare(high, low);
 
-    if (open.value >= close.value) {
-        open.classList.add('high');
-        close.classList.add('low');
-    }
-    else {
-        open.classList.add('low');
-        close.classList.add('high');
-    }
+    _ = compare(open, close);
 
-    if (latest_vol.value >= previous_vol.value) {
-        latest_vol.classList.add('high');
-        previous_vol.classList.add('low');
-    }
-    else {
-        latest_vol.classList.add('low');
-        previous_vol.classList.add('high');
-    }
+    _ = compare(latest_vol, previous_vol);
 
-    if (high52.value >= low52.value) {
-        high52.classList.add('high');
-        low52.classList.add('low');
-    }
-    else {
-        high52.classList.add('low');
-        low52.classList.add('high');
-    }
+    _ = compare(high52, low52);
 
+}
+
+function compare(ob1, ob2) {
+    if (parseFloat(ob1.innerText) >= parseFloat(ob2.innerText)) {
+        set_high(ob1);
+        set_low(ob2);
+        return true;
+    }
+    set_low(ob1);
+    set_high(ob2);
+    return false;
+}
+
+function set_high(ob) {
+    ob.classList.add('high');
+}
+
+function set_low(ob) {
+    ob.classList.add('low');
 }

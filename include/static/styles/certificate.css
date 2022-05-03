@@ -10,6 +10,11 @@
 
 .stock-logo {
     margin-right: 40px;
+    max-width: 250px;
+}
+
+.stock-logo img {
+    max-width: 100%;
 }
 
 .stock-info {
