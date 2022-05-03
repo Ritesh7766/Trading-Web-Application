@@ -20,3 +20,9 @@
 .stock-info {
     margin-bottom: 20px;
 }
+
+@media screen and (max-width: 580px) {
+    .form {
+        flex-direction: column;
+    }
+}

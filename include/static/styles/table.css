@@ -66,6 +66,10 @@ table button {
     width: 40px;
 }
 
+#stock-header {
+    margin-bottom: 10px;
+}
+
 @media screen and (max-width: 670px) {
     .btns {
         flex-direction: column;
@@ -73,5 +77,10 @@ table button {
 
     #table {
         margin: 30px;
+    }
+
+    .stocks-owned {
+        margin-top: 20px;
+        margin-bottom: 20px;
     }
 }

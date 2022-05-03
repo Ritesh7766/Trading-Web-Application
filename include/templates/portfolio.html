@@ -9,15 +9,16 @@ portfolio
   <link rel="stylesheet" href="{{ url_for('static', filename='/styles/color_scheme.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='/styles/flex_container.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='/styles/table.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='/styles/chart.css') }}">
 {% endblock %}
 
 {% block body %}
   <div class="flex-container">
-    <div class="sidebar scrollable">
+    <div class="scrollable sidebar">
 
       <!-- Allows user to look up a stock by its symbol -->
       <div class="field">
-        <p class="gen-txt">Search by Symbol</p>
+        <p class="gen-txt">Symbol</p>
         <div class="input">
           <div class="input-icn total-center">
             <img src="{{ url_for('static', filename='/assets/icons8-search.svg') }}" alt="">
@@ -36,16 +37,17 @@ portfolio
           <input id="name" type="text" placeholder="name" autocomplete = "off" name="nm">
         </div>
       </div>
-
+      
       <div class="stocks-owned">
-        <table>
+        <h4 id="stock-header">My Shares:</h4>
+        <table id="ownership">
           <tr>
             <th>Logo</th>
             <th>Symbol</th>
             <th>Shares</th>
           </tr>
         {% for stock in stocks %} 
-          <tr>
+          <tr class="trigger">
             <td><img class="small-logo" src="{{ stock.logo }}" alt=""></td>
             <td>{{ stock.stock_id }}</td>
             <td>{{ stock.shares }}</td>
@@ -56,8 +58,53 @@ portfolio
 
     </div>
 
-    <div class="information">
-  
+    <div class="information chart-container">
+      <div class="hidden-info">
+        <p></p>
+      </div>
+
+      <div class="shares-overview">
+        <iframe id="shares-distribution" width="100%" frameborder="0"></iframe>
+      </div>
+      
+      <script>
+        async function overview() {
+          let response = await fetch(`/plot_overview`);
+          let data = await response.json();
+          let html = data['file'];
+          iframe = document.getElementById('shares-distribution');
+          iframe.style.height = '500px';
+          iframe.src = "blank.html";
+          iframe.contentDocument.write(html);
+          iframe.contentDocument.close();
+        }
+        overview();
+      </script>
+
+      <div class="plots">
+
+        <div class="field">
+          <p class="gen-txt">Plot Type</p>
+          <div class="input">
+            <div class="input-icn total-center">
+              <img src="{{ url_for('static', filename='/assets/plot2.png') }}" alt="">
+            </div>
+            <select name="plot" id="plot">
+              {% for type in types %}
+                <option value="{{ type }}">{{ type }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="chart">
+        <iframe id="specific-plot" width="100%" height="500px" frameborder="0"></iframe>
+      </div>
+
     </div>
   </div>
+<script src="{{ url_for('static', filename='/scripts/ownership_search.js') }}"></script>
+<script src="{{ url_for('static', filename='/scripts/chart_plotter.js') }}"></script>
 {% endblock %}

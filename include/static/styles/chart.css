@@ -1,0 +1,25 @@
+@media screen and (max-width: 1000px) {
+    iframe {
+        height: 400px;
+    }
+}
+
+@media screen and (max-width: 770px) {
+    iframe {
+        height: 350px;
+    }
+}
+
+@media screen and (max-width: 670px) {
+    iframe {
+        height: 300px;
+    }
+
+    .chart-container {
+        margin: 0;
+    }
+}
+
+.hidden-info {
+    display: none;
+}

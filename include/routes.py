@@ -5,7 +5,9 @@ from include import app, db
 from flask_login import login_user, current_user, logout_user
 from include.utils import logout_required, login_required, lookup_symbol
 from datetime import datetime
-
+import yfinance
+import plotly.graph_objects as go
+import plotly.offline as pyo
 
 @app.route('/')
 @app.route('/home')
@@ -142,6 +144,33 @@ def search():
     return jsonify(data)
 
 
+@app.route('/search_ownership')
+@login_required(current_user, redirect)
+def search_ownership():
+    sym = request.args.get('sym')
+    nm = request.args.get('nm')
+    data, res = [], None
+    # If user has entered a symbol, than search by symbol.
+    if sym:
+        res = db.engine.execute(f'SELECT logo, stock_id, shares FROM stocks__owned WHERE user_id = {current_user.id} AND stock_id LIKE "%{sym}%"')
+    # If user has entered a name, than search by name.
+    elif nm:
+        res = db.engine.execute(f'SELECT logo, stock_id, shares \
+                                  FROM stocks__owned \
+                                  JOIN stock ON \
+                                  stocks__owned.stock_id = stock.symbol \
+                                  WHERE user_id = {current_user.id} AND stock.company_name LIKE "%{nm}%"')
+    # If no symbol provided, than return all stocks currently owned by the user.
+    if not res:
+        res = db.engine.execute(f'SELECT logo, stock_id, shares FROM stocks__owned WHERE user_id = {current_user.id}')
+    # Convert the data into a list of dictionaries.
+    for logo, stock_id, shares in res:
+        data.append({'logo': logo, 'stock_id': stock_id, 'shares': shares})
+    # Return the result in JSON format.
+    print(data)
+    return jsonify(data)
+    
+
 @app.route('/buy', methods = ['GET', 'POST'])
 @login_required(current_user, redirect)
 def buy():
@@ -166,6 +195,7 @@ def buy():
         # If the available balance is less than the cost than cancel transaction.
         if balance < total:
             flash(f'Insufficient Balance!', category = 'primary')
+            return redirect('/portfolio')
 
         # Otherwise deduct the amount from the current balance.
         current_user.cash -= total
@@ -205,4 +235,85 @@ def buy():
 def portfolio():
     # Get all the stocks owned by the user.
     stocks = Stocks_Owned.query.filter_by(user_id = current_user.id).all()
-    return render_template('portfolio.html', stocks = stocks)
+    types = ['Candlestick', 'Lines', 'Scatter', 'Lines_scatter', 'Bar']
+    return render_template('portfolio.html', stocks = stocks, types = types, jsonify = jsonify)
+
+
+@app.route('/plot_overview')
+@login_required(current_user, redirect)
+def plot_overview():
+    stocks = Stocks_Owned.query.filter_by(user_id = current_user.id).all()
+    values, labels = [], []
+    for stock in stocks:
+        values.append(stock.shares)
+        labels.append(stock.stock_id)
+    val = pyo.plot({"data": [go.Pie(values = values, labels = labels)]
+          , "layout": go.Layout(title = 'Overview')
+          }, output_type='div')
+    data = {'file': val}
+    return jsonify(data)
+        
+
+@app.route('/plot_candlestick')
+@login_required(current_user, redirect)
+def plot_candlestick():
+    sym = request.args.get('sym')
+    ticker = yfinance.Ticker(sym)
+    hist = ticker.history(period = '1y')
+    div = pyo.plot({"data": [go.Candlestick(x = hist.index, open = hist['Open'], high = hist['High'], low = hist['Low'], close = hist['Close'])]
+                    ,"layout": go.Layout(title = sym, margin = dict(l=0, r=0, t=30, b=30))
+                    }, output_type='div')
+    data = {'file': div}
+    return jsonify(data)
+
+
+@app.route('/plot_lines')
+@login_required(current_user, redirect)
+def plot_lines():
+    sym = request.args.get('sym')
+    ticker = yfinance.Ticker(sym)
+    hist = ticker.history(period = '1y')
+    div = pyo.plot({"data": [go.Scatter(x = hist.index, y = hist['Close'], mode = 'lines')]
+                    ,"layout": go.Layout(title = sym, margin = dict(l=0, r=0, t=30, b=30))
+                    }, output_type='div')
+    data = {'file': div}
+    return jsonify(data)
+
+
+@app.route('/plot_scatter')
+@login_required(current_user, redirect)
+def plot_scatter():
+    sym = request.args.get('sym')
+    ticker = yfinance.Ticker(sym)
+    hist = ticker.history(period = '1y')
+    div = pyo.plot({"data": [go.Scatter(x = hist.index, y = hist['Close'], mode = 'markers')]
+                    ,"layout": go.Layout(title = sym, margin = dict(l=0, r=0, t=30, b=30))
+                    }, output_type='div')
+    data = {'file': div}
+    return jsonify(data)
+
+
+@app.route('/plot_lines_scatter')
+@login_required(current_user, redirect)
+def plot_lines_scatter():
+    sym = request.args.get('sym')
+    ticker = yfinance.Ticker(sym)
+    hist = ticker.history(period = '1y')
+    div = pyo.plot({"data": [go.Scatter(x = hist.index, y = hist['Close'], mode = 'lines+markers')]
+                    ,"layout": go.Layout(title = sym, margin = dict(l=0, r=0, t=30, b=30))
+                    }, output_type='div')
+    data = {'file': div}
+    return jsonify(data)
+
+
+@app.route('/plot_bar')
+@login_required(current_user, redirect)
+def plot_bar():
+    sym = request.args.get('sym')
+    ticker = yfinance.Ticker(sym)
+    hist = ticker.history(period = '1y')
+    div = pyo.plot({"data": [go.Bar(x = hist.index, y = hist['Close'])]
+                    ,"layout": go.Layout(title = sym, margin = dict(l=0, r=0, t=30, b=30))
+                    }, output_type='div')
+    data = {'file': div}
+    return jsonify(data)

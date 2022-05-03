@@ -36,6 +36,7 @@ Fixed sidebar for PC
 .information {
     margin: 30px;
     margin-left: 250px;
+    width: 100%;
 }
 
 @media screen and (max-width: 670px) {
@@ -43,7 +44,16 @@ Fixed sidebar for PC
         flex-direction: column;
     }
 
+    .information {
+        margin-left: 30px;
+    }
+
     .sidebar {
         position: static;
+    }
+
+    .scrollable {
+        overflow: initial;
+        width: auto;
     }
 }
