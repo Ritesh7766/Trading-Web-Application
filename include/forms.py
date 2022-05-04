@@ -57,3 +57,13 @@ class PurchaseForm(FlaskForm):
         if int(shares.data) <= 0:
             raise ValidationError('Number of shares must be at least 1.')
 
+
+class SellForm(FlaskForm):
+    shares = StringField()
+    submit = SubmitField(label = 'Sell')
+
+    def validate_shares(self, shares):
+        if not shares.data.isdigit():
+            raise ValidationError('Number of shares must be a positive number!')
+        if int(shares.data) <= 0:
+            raise ValidationError('Number of shares must be at least 1.')

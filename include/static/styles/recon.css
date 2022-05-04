@@ -86,6 +86,9 @@ p, b {
 }
 
 @media screen and (max-width: 670px) {
+    .information {
+        width: auto;
+    }
 
     .description {
         width: auto;

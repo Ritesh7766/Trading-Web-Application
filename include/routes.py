@@ -1,13 +1,14 @@
 from flask import Flask, render_template, url_for, flash, redirect, jsonify, request, session
-from include.forms import LoginForm, RegistrationForm, PurchaseForm
+from include.forms import LoginForm, RegistrationForm, PurchaseForm, SellForm
 from include.models import User, Stock, Stocks_Owned, Transaction
 from include import app, db
 from flask_login import login_user, current_user, logout_user
-from include.utils import logout_required, login_required, lookup_symbol
+from include.utils import logout_required, login_required, lookup_symbol, lookup_symbol_quote
 from datetime import datetime
 import yfinance
 import plotly.graph_objects as go
 import plotly.offline as pyo
+import json
 
 @app.route('/')
 @app.route('/home')
@@ -167,7 +168,6 @@ def search_ownership():
     for logo, stock_id, shares in res:
         data.append({'logo': logo, 'stock_id': stock_id, 'shares': shares})
     # Return the result in JSON format.
-    print(data)
     return jsonify(data)
     
 
@@ -175,8 +175,8 @@ def search_ownership():
 @login_required(current_user, redirect)
 def buy():
     form = PurchaseForm()
-    # Make sure symbol exists in session variable.
     symbol = request.args.get('sym')
+    # Make sure symbol exists in session variable.
     if symbol not in session:
         stock_info = lookup_symbol(symbol)
         session[symbol] = stock_info
@@ -199,7 +199,6 @@ def buy():
 
         # Otherwise deduct the amount from the current balance.
         current_user.cash -= total
-        db.session.commit()
 
         # Update ownership.
         stock = Stocks_Owned.query.filter_by(user_id = current_user.id, stock_id = stock_info['quote']['symbol']).first()
@@ -210,7 +209,6 @@ def buy():
         else:
             stock_owned = Stocks_Owned(user_id = current_user.id, stock_id = stock_info['quote']['symbol'], shares = shares, logo = stock_info['logo']['url'])
             db.session.add(stock_owned)
-        db.session.commit()
 
         # Record the transaction.
         transaction = Transaction(user_id = current_user.id, stock_id = stock_info['quote']['symbol'], shares = shares, price = price)
@@ -218,7 +216,7 @@ def buy():
         db.session.commit()
 
         flash(f"Purchased {shares} stocks of {stock_info['company']['companyName']} for ${total}", category = 'success')
-        return redirect('/')
+        return redirect('/portfolio')
         
     elif form.errors != {}:
         if 'submit' not in request.form:
@@ -230,36 +228,117 @@ def buy():
     return render_template('buy.html', form = form, stock_info = stock_info)
 
 
+@app.route('/sell', methods = ['GET', 'POST'])
+@login_required(current_user, redirect)
+def sell():
+    form = SellForm()
+    symbol = request.args.get('sym')
+    # Make sure symbol exists in session variable.
+    if symbol not in session:
+        stock_info = lookup_symbol(symbol)
+        session[symbol] = stock_info
+    stock_info = session[symbol][symbol]
+    if form.validate_on_submit():
+        if 'submit' not in request.form:
+            return redirect(url_for('quote'))
+        shares = int(request.form.get('shares'))
+
+        # Make sure the user actually has these many shares.
+        stock = Stocks_Owned.query.filter_by(user_id = current_user.id, stock_id = stock_info['quote']['symbol']).first()
+        if not stock or stock.shares < shares:
+            flash(f"Insufficient shares!", category = 'primary')
+            return redirect('/quote')
+
+        # Get the current price of stock.
+        price = float(stock_info['quote']['latestPrice'])
+
+        # Compute the total cost of selling the stocks.
+        total = shares * price
+
+        # Update the number of stocks.
+        stock.shares -= shares
+
+        # If the number of shares is 0 than remove it from the db.
+        if stock.shares == 0:
+            db.session.delete(stock)
+
+        # Update the balance of the user.
+        current_user.cash += total
+
+        # Record the transaction.
+        transaction = Transaction(user_id = current_user.id, stock_id = stock_info['quote']['symbol'], shares = -1 * shares, price = price)
+        db.session.add(transaction)
+        db.session.commit()
+        flash(f"Sold {shares} stocks of {stock_info['company']['companyName']} for ${total}", category = 'success')
+        return redirect('/portfolio')
+        
+    elif form.errors != {}:
+        if 'submit' not in request.form:
+            return redirect(url_for('quote'))
+        for category, err_msgs in form.errors.items():
+            for err_msg in err_msgs:
+                flash(f'There was an error: {err_msg}', category = 'danger')
+
+    return render_template('sell.html', form = form, stock_info = stock_info)
+
+
+
 @app.route('/portfolio')
 @login_required(current_user, redirect)
 def portfolio():
     # Get all the stocks owned by the user.
+    views = ['shares', 'amount']
+    periods = ['1y', '2y', '3y', '4y', '5y', '10y', '15y']
     stocks = Stocks_Owned.query.filter_by(user_id = current_user.id).all()
     types = ['Candlestick', 'Lines', 'Scatter', 'Lines_scatter', 'Bar']
-    return render_template('portfolio.html', stocks = stocks, types = types, jsonify = jsonify)
+    return render_template('portfolio.html', stocks = stocks, types = types, views = views, periods = periods)
 
 
-@app.route('/plot_overview')
+@app.route('/plot_overview_shares')
 @login_required(current_user, redirect)
-def plot_overview():
+def plot_overview_shares():
     stocks = Stocks_Owned.query.filter_by(user_id = current_user.id).all()
     values, labels = [], []
     for stock in stocks:
         values.append(stock.shares)
         labels.append(stock.stock_id)
     val = pyo.plot({"data": [go.Pie(values = values, labels = labels)]
-          , "layout": go.Layout(title = 'Overview')
+          , "layout": go.Layout(title = 'Overview', margin = dict(l = 10, r = 10, t = 30, b = 30))
           }, output_type='div')
     data = {'file': val}
     return jsonify(data)
-        
+
+
+@app.route('/plot_overview_amount')
+@login_required(current_user, redirect)
+def plot_overview_amount():
+    stocks = Stocks_Owned.query.filter_by(user_id = current_user.id).all()
+    values, labels = [], []
+    for stock in stocks:
+        values.append(stock.shares)
+        labels.append(stock.stock_id)
+    # Get the latest price of all the stocks owned by the user.
+    for i in range(len(labels)):
+        if labels[i] in session:
+            quote = session[labels[i]]
+        else: 
+            quote = lookup_symbol_quote(labels[i])
+            session[labels[i]][labels[i]]['quote'] = quote[labels[i]]['quote']
+        values[i] = values[i] * quote[labels[i]]['quote']['latestPrice']
+    val = pyo.plot({"data": [go.Pie(values = values, labels = labels)]
+          , "layout": go.Layout(title = 'Overview', margin = dict(l = 10, r = 10, t = 30, b = 30))
+          }, output_type='div')
+    data = {'file': val}
+    return jsonify(data)
+
 
 @app.route('/plot_candlestick')
 @login_required(current_user, redirect)
 def plot_candlestick():
     sym = request.args.get('sym')
+    prd = request.args.get('prd')
     ticker = yfinance.Ticker(sym)
-    hist = ticker.history(period = '1y')
+    hist = ticker.history(period = prd)
     div = pyo.plot({"data": [go.Candlestick(x = hist.index, open = hist['Open'], high = hist['High'], low = hist['Low'], close = hist['Close'])]
                     ,"layout": go.Layout(title = sym, margin = dict(l=0, r=0, t=30, b=30))
                     }, output_type='div')
@@ -271,8 +350,9 @@ def plot_candlestick():
 @login_required(current_user, redirect)
 def plot_lines():
     sym = request.args.get('sym')
+    prd = request.args.get('prd')
     ticker = yfinance.Ticker(sym)
-    hist = ticker.history(period = '1y')
+    hist = ticker.history(period = prd)
     div = pyo.plot({"data": [go.Scatter(x = hist.index, y = hist['Close'], mode = 'lines')]
                     ,"layout": go.Layout(title = sym, margin = dict(l=0, r=0, t=30, b=30))
                     }, output_type='div')
@@ -284,8 +364,9 @@ def plot_lines():
 @login_required(current_user, redirect)
 def plot_scatter():
     sym = request.args.get('sym')
+    prd = request.args.get('prd')
     ticker = yfinance.Ticker(sym)
-    hist = ticker.history(period = '1y')
+    hist = ticker.history(period = prd)
     div = pyo.plot({"data": [go.Scatter(x = hist.index, y = hist['Close'], mode = 'markers')]
                     ,"layout": go.Layout(title = sym, margin = dict(l=0, r=0, t=30, b=30))
                     }, output_type='div')
@@ -297,8 +378,9 @@ def plot_scatter():
 @login_required(current_user, redirect)
 def plot_lines_scatter():
     sym = request.args.get('sym')
+    prd = request.args.get('prd')
     ticker = yfinance.Ticker(sym)
-    hist = ticker.history(period = '1y')
+    hist = ticker.history(period = prd)
     div = pyo.plot({"data": [go.Scatter(x = hist.index, y = hist['Close'], mode = 'lines+markers')]
                     ,"layout": go.Layout(title = sym, margin = dict(l=0, r=0, t=30, b=30))
                     }, output_type='div')
@@ -310,8 +392,9 @@ def plot_lines_scatter():
 @login_required(current_user, redirect)
 def plot_bar():
     sym = request.args.get('sym')
+    prd = request.args.get('prd')
     ticker = yfinance.Ticker(sym)
-    hist = ticker.history(period = '1y')
+    hist = ticker.history(period = prd)
     div = pyo.plot({"data": [go.Bar(x = hist.index, y = hist['Close'])]
                     ,"layout": go.Layout(title = sym, margin = dict(l=0, r=0, t=30, b=30))
                     }, output_type='div')

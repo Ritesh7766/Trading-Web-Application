@@ -23,3 +23,23 @@
 .hidden-info {
     display: none;
 }
+
+.flex-cont {
+    display: flex;
+}
+
+.transactions {
+    margin: 10px;
+    display: flex;
+    justify-content: end;
+}
+
+.transactions button {
+    padding: 15px 15px;
+    width: 70px;
+    margin: 5px;
+}
+
+.title {
+    margin: 10px;
+}

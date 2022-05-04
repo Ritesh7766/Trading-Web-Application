@@ -42,9 +42,16 @@ Adding styles to the submit button
 .submit-btn {
     padding: 15px 10px;
     border-radius: 10px;
-    float: right;
     margin: 10px 10px;
     min-width: 70px;
+}
+
+.right {
+    float: right;
+}
+
+.no-margin {
+    margin: 0;
 }
 
 /* 

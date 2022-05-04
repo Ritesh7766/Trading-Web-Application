@@ -11,7 +11,7 @@
 }
 
 .info-highlight:hover {
-    background-color: rgb(106, 106, 255);
+    background-color: rgb(5, 5, 165);
     color: white;
     transition-duration: 0.4s;
 } 
@@ -22,7 +22,7 @@
 }
 
 .success-border {
-    border: 1px solid #6bbf17;
+    border: 1px solid #1db801;
 }
 
 .success-txt {
@@ -30,10 +30,29 @@
 }
 
 .success-highlight:hover {
-    background-color: #7ee318;
+    background-color: #62c400;
     color: white;
     transition-duration: 0.4s;
 } 
+
+
+.danger {
+    background-color: #ffd3d3;
+ }
+ 
+ .danger-border {
+     border: 1px solid #c73636;
+ }
+ 
+ .danger-txt {
+     color: #c73636;
+ }
+ 
+ .danger-highlight:hover {
+     background-color: #c73636;
+     color: white;
+     transition-duration: 0.4s;
+ } 
 
 /*---------------------------------------*/
 

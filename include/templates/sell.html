@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block title %}
-buy
+sell
 {% endblock %}
 
 {% block head %}
@@ -60,7 +60,7 @@ buy
               </div>
             </div>
 
-            {{ form.submit(class = 'submit-btn right success success-border success-txt success-highlight') }}
+            {{ form.submit(class = 'submit-btn right danger danger-border danger-txt danger-highlight') }}
             <a href="/index"><button id="cancel"  value="cancel" class="submit-btn right info info-border info-txt info-highlight">Cancel</button></a>
           </div>
       </div>

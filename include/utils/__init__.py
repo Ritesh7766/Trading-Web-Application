@@ -42,3 +42,19 @@ def lookup_symbol(symbol):
     
     # Return the response in JSON format.
     return response.json()
+
+
+def lookup_symbol_quote(symbol):
+    # Request the api for information.
+    try:
+        token = os.environ['IEX']
+        #token = 'Tpk_c1f51c49da9c413a9ea676bfd7322915'
+        url = f'https://cloud.iexapis.com/stable/stock/market/batch?symbols={symbol}&types=quote&token={token}'
+        #url = f'https://sandbox.iexapis.com/stable/stock/market/batch?symbols={symbol}&types=Logo,company,quote&token={token}'
+        response = requests.get(url)
+        response.raise_for_status()
+    except requests.RequestException:
+        return None
+    
+    # Return the response in JSON format.
+    return response.json()
