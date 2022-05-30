@@ -79,6 +79,20 @@ tr:nth-child(1) {
     height: 40px;
 }
 
+
+@media screen and (max-width: 360px) {
+    #transaction-tab * {
+        font-size: 0.85em;
+    }
+}
+
+@media screen and (max-width: 420px) {
+    #transaction-tab * {
+        font-size: 0.9em;
+    }
+}
+
+
 @media screen and (max-width: 670px) {
     .btns {
         flex-direction: column;

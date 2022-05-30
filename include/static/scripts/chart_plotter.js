@@ -1,4 +1,4 @@
-Array.from(document.getElementsByClassName('trigger')).forEach(element =>  {
+Array.from(document.getElementById('ownership').getElementsByClassName('trigger')).forEach(element =>  {
     element.addEventListener('click', async function() {
         var type = document.getElementById('plot').value.toLowerCase();
         var sym = this.getElementsByTagName('td')[1].innerText;
@@ -34,7 +34,7 @@ async function plot(type, sym, prd, parent) {
     let data = await response.json();
     let html = data['file'];
     iframe = document.getElementById('specific-plot');
-    iframe.src = "blank.html";
+    //iframe.src = "blank.html";
     iframe.contentDocument.write(html);
     iframe.contentDocument.close();
     parent.style.cursor = 'default';

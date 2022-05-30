@@ -56,6 +56,7 @@ class Transaction(db.Model):
     stock_id = db.Column(db.String(20), db.ForeignKey('stock.symbol'))
     shares = db.Column(db.Integer, nullable = False)
     price = db.Column(db.Float, nullable = False)
+    logo = db.Column(db.Text)
     transacted = db.Column(db.DateTime, default = datetime.datetime.now() )
 
     # Specifying how the object is printed whenever we print it out.

@@ -3,7 +3,7 @@ from include.forms import LoginForm, RegistrationForm, PurchaseForm, SellForm
 from include.models import User, Stock, Stocks_Owned, Transaction
 from include import app, db
 from flask_login import login_user, current_user, logout_user
-from include.utils import logout_required, login_required, lookup_symbol, lookup_symbol_quote
+from include.utils import logout_required, login_required, lookup_symbol, lookup_symbol_quote, update_price
 from datetime import datetime
 import yfinance
 import plotly.graph_objects as go
@@ -13,6 +13,8 @@ import json
 @app.route('/')
 @app.route('/home')
 def index():
+    #if current_user:
+    #    update_price(current_user, session)
     return render_template('index.html')
 
 
@@ -59,6 +61,7 @@ def login():
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember.data)
             flash('Login successful.', category = 'success')
+            #update_price(current_user, session)
             return redirect(url_for('index'))
         else: 
             flash('Login unsuccessful. Please check email and password.', category = 'danger')
@@ -183,7 +186,7 @@ def buy():
     stock_info = session[symbol][symbol]
     if form.validate_on_submit():
         if 'submit' not in request.form:
-            return redirect(url_for('quote'))
+            return redirect(url_for('portfolio'))
         shares = int(request.form.get('shares'))
         price = float(stock_info['quote']['latestPrice'])
         # Compute the total cost of purchasing the stocks.
@@ -212,6 +215,8 @@ def buy():
 
         # Record the transaction.
         transaction = Transaction(user_id = current_user.id, stock_id = stock_info['quote']['symbol'], shares = shares, price = price)
+        transaction.transacted = datetime.now()
+        transaction.logo = stock_info['logo']['url']
         db.session.add(transaction)
         db.session.commit()
 
@@ -240,7 +245,7 @@ def sell():
     stock_info = session[symbol][symbol]
     if form.validate_on_submit():
         if 'submit' not in request.form:
-            return redirect(url_for('quote'))
+            return redirect(url_for('portfolio'))
         shares = int(request.form.get('shares'))
 
         # Make sure the user actually has these many shares.
@@ -267,6 +272,8 @@ def sell():
 
         # Record the transaction.
         transaction = Transaction(user_id = current_user.id, stock_id = stock_info['quote']['symbol'], shares = -1 * shares, price = price)
+        transaction.transacted = datetime.now()
+        transaction.logo = stock_info['logo']['url']
         db.session.add(transaction)
         db.session.commit()
         flash(f"Sold {shares} stocks of {stock_info['company']['companyName']} for ${total}", category = 'success')
@@ -289,8 +296,11 @@ def portfolio():
     # Get all the stocks owned by the user.
     views = ['shares', 'amount']
     periods = ['1y', '2y', '3y', '4y', '5y', '10y', '15y']
-    stocks = Stocks_Owned.query.filter_by(user_id = current_user.id).all()
     types = ['Candlestick', 'Lines', 'Scatter', 'Lines_scatter', 'Bar']
+    stocks = Stocks_Owned.query.filter_by(user_id = current_user.id).all()
+    if not stocks:
+        flash("You currently don't own any shares. Start investing today!", category = 'warning')
+        return redirect('/quote')
     return render_template('portfolio.html', stocks = stocks, types = types, views = views, periods = periods)
 
 
@@ -322,8 +332,8 @@ def plot_overview_amount():
         if labels[i] in session:
             quote = session[labels[i]]
         else: 
-            quote = lookup_symbol_quote(labels[i])
-            session[labels[i]][labels[i]]['quote'] = quote[labels[i]]['quote']
+            quote = lookup_symbol(labels[i])
+            session[labels[i]] = quote
         values[i] = values[i] * quote[labels[i]]['quote']['latestPrice']
     val = pyo.plot({"data": [go.Pie(values = values, labels = labels)]
           , "layout": go.Layout(title = 'Overview', margin = dict(l = 10, r = 10, t = 30, b = 30))
@@ -400,3 +410,48 @@ def plot_bar():
                     }, output_type='div')
     data = {'file': div}
     return jsonify(data)
+
+
+@app.route('/history')
+@login_required(current_user, redirect)
+def history():
+    views = ['Recent', 'Old']
+    transactions = Transaction.query.filter_by(user_id = current_user.id).order_by(Transaction.transacted.desc()).all()
+    if not transactions:
+        flash("You haven't carried out any transactions.", category = 'warning')
+    return render_template('history.html', transactions = transactions, views = views)
+
+
+@app.route('/history_sym')
+@login_required(current_user, redirect)
+def history_sym():
+    sym = request.args.get('sym')
+    transactions = Transaction.query.filter_by(user_id = current_user.id and Transaction.stock_id.like('%'+ sym +'%')).order_by(Transaction.transacted.desc()).all()
+    data = []
+    for transaction in transactions:
+        data.append({'logo': transaction.logo, 'sym': transaction.stock_id, 'shares': transaction.shares, 'price': transaction.price, 'datetime': transaction.transacted})
+    return jsonify(data)
+
+
+@app.route('/history_sort')
+@login_required(current_user, redirect)
+def history_sort():
+    sort = request.args.get('sort')
+    if sort == 'Old':
+        transactions = Transaction.query.filter_by(user_id = current_user.id).order_by(Transaction.transacted).all()
+    elif sort == 'Recent':
+        transactions = Transaction.query.filter_by(user_id = current_user.id).order_by(Transaction.transacted.desc()).all()
+    else: 
+        flash('Invalid request!', category = 'danger')
+        return redirect('/history')
+    data = []
+    for transaction in transactions:
+        data.append({'logo': transaction.logo, 'sym': transaction.stock_id, 'shares': transaction.shares, 'price': transaction.price, 'datetime': transaction.transacted})
+    return jsonify(data)
+
+
+@app.route('/profile')
+@login_required(current_user, redirect)
+def profile():
+    
+    return render_template('profile.html')

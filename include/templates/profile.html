@@ -1,0 +1,42 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+profile
+{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='/styles/forms.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='/styles/color_scheme.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='/styles/flex_container.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='/styles/recon.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='/styles/profile.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="flex-container">
+  <div class="sidebar">
+
+    <div class="profile">
+      <div class="pic">
+        <img src="{{ url_for('static', filename='/assets/default.jpg') }}" alt="">
+      </div>
+      <div class="flex-box">
+        <div class="icon">
+          <img src="{{ url_for('static', filename='/assets/mail.png') }}" alt="">
+        </div>
+        <p class="small-text marg8">riteshsaha214@gmail.com</p>
+      </div>
+      <div class="flex-box">
+        <div class="icon">
+          <img src="{{ url_for('static', filename='/assets/money.png') }}" alt="">
+        </div>
+        <p class="small-text marg8">{{ current_user.cash }}</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="information">
+  </div>
+</div>
+{% endblock %}

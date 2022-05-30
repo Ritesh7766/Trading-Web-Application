@@ -2,6 +2,7 @@
 from functools import wraps
 import requests
 import os
+from include.models import Stocks_Owned
 
 
 def logout_required(current_user, redirect):
@@ -58,3 +59,16 @@ def lookup_symbol_quote(symbol):
     
     # Return the response in JSON format.
     return response.json()
+
+
+def update_price(current_user, session):
+    # Update the price of every stock owned by the current user and add it in the session variable.
+    stocks = Stocks_Owned.query.filter_by(user_id = current_user.id).all()
+    for stock in stocks:
+        if stock not in session:
+            data = lookup_symbol(stock.stock_id)
+            session[stock.stock_id] = data
+        else: 
+            quote = lookup_symbol_quote(stock.stock_id)
+            session[stock.stock_id][stock.stock_id]['quote'] = quote
+    
