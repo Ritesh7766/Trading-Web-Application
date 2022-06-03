@@ -1,6 +1,5 @@
 document.getElementById('share').addEventListener('change', async function() {
     var sym = this.value;
-    console.log(sym)
     var prd = document.getElementById('period').value;
     plot(sym, prd);
 });

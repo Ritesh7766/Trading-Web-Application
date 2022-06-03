@@ -155,7 +155,7 @@ profile
             <div class="input-icn total-center">
               <img src="{{ url_for('static', filename='/assets/plot2.png') }}" alt="">
             </div>
-            <select name="share" id="share">
+            <select name="share2" id="share2">
               {% for symbol in symbols %}
                 <option value="{{ symbol }}">{{ symbol }}</option>
               {% endfor %}
@@ -169,7 +169,7 @@ profile
             <div class="input-icn total-center">
               <img src="{{ url_for('static', filename='/assets/clock.png') }}" alt="">
             </div>
-            <select name="period" id="period">
+            <select name="period2" id="period2">
               {% for period in periods %}
                 <option value="{{ period }}">{{ period }}</option>
               {% endfor %}
@@ -190,7 +190,9 @@ profile
 
 <script src="{{ url_for('static', filename='/scripts/ownership_search.js') }}"></script>
 <script src="{{ url_for('static', filename='/scripts/plot_ma.js') }}"></script>
+<script src="{{ url_for('static', filename='/scripts/plot_pred.js') }}"></script>
  <script>
     plot('{{ symbols[0] }}', '5y');
-  </script>
+    plot_pred('{{ symbols[0] }}', '1y', document.getElementById('share2') );
+ </script>
 {% endblock %}

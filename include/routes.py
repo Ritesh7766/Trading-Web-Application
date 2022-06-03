@@ -9,6 +9,7 @@ import yfinance
 import plotly.graph_objects as go
 import plotly.offline as pyo
 import json
+from include.predictor import predict
 
 @app.route('/')
 @app.route('/home')
@@ -487,4 +488,14 @@ def plot_moving_avg():
                 "layout": go.Layout(title = sym, margin = dict(l=0, r=0, t=30, b=30), )
                }, output_type='div')
     data = {'file': div}
+    return jsonify(data)
+
+
+@app.route('/get_prediction')
+@login_required(current_user, redirect)
+def get_prediction():
+    sym = request.args.get('sym')
+    prd = request.args.get('prd')
+    prd = int(prd[0 : len(prd) - 1])
+    data = predict(symbol = sym, period = prd)
     return jsonify(data)
