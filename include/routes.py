@@ -453,5 +453,38 @@ def history_sort():
 @app.route('/profile')
 @login_required(current_user, redirect)
 def profile():
-    
-    return render_template('profile.html')
+    stocks_owned = Stocks_Owned.query.filter_by(user_id = current_user.id).all()
+    periods = ['1y', '2y', '3y', '4y', '5y', '10y', '15y']
+    symbols = []
+    stocks = []
+    for stock in stocks_owned:
+        if stock.stock_id not in session:
+            stock_info = lookup_symbol(stock.stock_id)
+            session[stock.stock_id] = stock_info
+        symbols.append(stock.stock_id)
+        stock_price = session[stock.stock_id][stock.stock_id]['quote']['latestPrice']
+        total = stock_price * stock.shares
+        stocks.append({'logo': stock.logo, 'symbol': stock.stock_id, 'shares': stock.shares, 'price': stock_price, 'total': '{:.4f}'.format(total)})
+    return render_template('profile.html', stocks = stocks, symbols = symbols, periods = periods)
+
+
+@app.route('/plot_moving_avg')
+@login_required(current_user, redirect)
+def plot_moving_avg():
+    sym = request.args.get('sym')
+    prd = request.args.get('prd')
+  
+    ticker = yfinance.Ticker(sym)
+    hist = ticker.history(period = prd)
+    hist['100MA'] = hist['Close'].rolling(window = 100).mean()
+    hist['200MA'] = hist['Close'].rolling(window = 200).mean()
+
+    div = pyo.plot({"data": go.Figure(data = go.Scatter(x = hist.index, y = hist['Close'], mode = 'lines') ).add_trace(
+                            go.Scatter(x = hist.index, y = hist['200MA'], line = dict(color = 'green'), name = '100MA')
+                        ).add_trace(
+                            go.Scatter(x = hist.index, y = hist['100MA'], line = dict(color = 'red'), name = '200MA')
+                        ),
+                "layout": go.Layout(title = sym, margin = dict(l=0, r=0, t=30, b=30), )
+               }, output_type='div')
+    data = {'file': div}
+    return jsonify(data)

@@ -2,3 +2,7 @@ symbols.json
 *.ipynb
 *.csv
 *.txt
+./prophet/*
+./prophet
+/prophet/*
+/prophet

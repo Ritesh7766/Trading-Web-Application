@@ -14,3 +14,11 @@
 .profile {
     margin: 20px;
 }
+
+.profile-scroll {
+    overflow: scroll;
+}
+
+.mtop30 {
+    margin-top: 30px;
+}

@@ -6,6 +6,10 @@ Styles common to all tables.
     margin-left: 250px;
 }
 
+#table2 {
+    margin-left: 280px;
+}
+
 table {
     border-collapse: collapse;
     border: 1px solid #bdc3c7;
@@ -96,6 +100,10 @@ tr:nth-child(1) {
 @media screen and (max-width: 670px) {
     .btns {
         flex-direction: column;
+    }
+
+    #table2 {
+        margin: 30px;
     }
 
     #table {
