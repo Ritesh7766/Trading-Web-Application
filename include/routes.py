@@ -16,7 +16,12 @@ from include.predictor import predict
 def index():
     #if current_user:
     #    update_price(current_user, session)
-    return render_template('index.html')
+    return render_template('about.html')
+
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
 
 @app.route('/register', methods = ['GET', 'POST'])
@@ -63,7 +68,7 @@ def login():
             login_user(user, remember=form.remember.data)
             flash('Login successful.', category = 'success')
             #update_price(current_user, session)
-            return redirect(url_for('index'))
+            return redirect(url_for('quote'))
         else: 
             flash('Login unsuccessful. Please check email and password.', category = 'danger')
     return render_template('login.html', form = form)
