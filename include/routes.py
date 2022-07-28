@@ -15,7 +15,7 @@ from include.predictor import predict
 @app.route('/home')
 def index():
     #if current_user:
-    #    update_price(current_user, session)
+    #   update_price(current_user, session)
     return render_template('about.html')
 
 
